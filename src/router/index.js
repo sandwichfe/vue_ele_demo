@@ -15,6 +15,7 @@ const routes = [
         meta: {
             title: '首页入口'
         }
+        
     }
 ]
 

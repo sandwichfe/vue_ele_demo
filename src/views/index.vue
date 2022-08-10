@@ -1,10 +1,10 @@
 <template>
-  <div class="main_content">
+   <div class="main_content">
 
     <div class="head_bg">
       <div class="head">
         <el-breadcrumb class="bottom clearfix">
-          <el-breadcrumb-item v-for="(h, index) in hs" @click.native="gopage(h,index)">{{
+          <el-breadcrumb-item v-for="(h, index) in hs" :key="index" @click.native="gopage(h,index)">{{
               h.preName
             }}
           </el-breadcrumb-item>
@@ -15,25 +15,11 @@
     </div>
 
     <div class="scroll_content">
-      <vue-scroll :ops="ops" style="width:100%;height:100%">
+      <vue-scroll :ops="ops" style="width:100%;height:100%" ref="vs">
         <div class="main_scroll_content">
 
-<el-row>
-  <el-col :span="8" v-for="(c, index) in contents" :key="index"  :offset="index > 0 ? 1 : 0" class="line">
-    <el-card :body-style="{ padding: '0px' }"  >
-      <img src="dsas" class="image">
-      <div style="padding: 14px;" @click="go(c)">
-        <span>{{ c.type }}</span>
-        <div class="bottom clearfix">
-          <time class="time">{{ c.preName }}</time>
-          <el-button type="text" class="button">操作按钮</el-button>
-        </div>
-      </div>
-    </el-card>
-  </el-col>
-</el-row> 
 
-          <ul v-if="false">
+          <ul>
             <li v-for="(c, index) in contents" :key="index" @click="go(c)" class="line">
               <div class="filetype">{{ c.type }}</div>
               <div class="prename"> {{ c.preName }}</div>
@@ -47,10 +33,11 @@
     </div>
 
 
-    <el-backtop target=".page-component__scroll .el-scrollbar__wrap"></el-backtop>
+    <el-backtop ></el-backtop>
 
 
   </div>
+
 
 </template>
 
@@ -96,7 +83,7 @@ export default {
           showDelay: 500,             //在鼠标离开容器后多长时间隐藏滚动条。
           onlyShowBarOnScroll: true,  //是否只在滚动时显示 bar。
           keepShow: true,            //滚动条是否保持显示。
-          background: "#7ddca8",      //滚动条背景色。
+          background: "#d9dcda",      //滚动条背景色。
           opacity: 1,                 //滚动条透明度。
           hoverStyle: false,
           specifyBorderRadius: false,  //是否指定滚动条的 borderRadius， 如果不那么和轨道的保持一致。
@@ -106,7 +93,6 @@ export default {
         },
       },
       sgo: true,
-
     };
   },
   activated() {  //用户点击进入时执行的方法
@@ -151,6 +137,10 @@ export default {
           this.hs.push(content)
 
           this.currentPath = newGo;
+
+          //新进子目录滚动条归到最前面  滚到某个div的位置  过渡速度为0
+          this.$refs["vs"].scrollIntoView(".main_scroll_content", 0);
+
         })
       } else if (type === "file") {
         //正斜杠替换反斜杠
@@ -204,6 +194,8 @@ export default {
         this.contents = res.data
         //关闭loading动画
         this.loading = false
+        // 滚动条位置 设置
+        this.$refs["vs"].scrollIntoView(".main_scroll_content", 0);
       })
     },
 
@@ -244,11 +236,6 @@ export default {
 
       })
 
-
-
-
-
-
     }
 
   },
@@ -257,40 +244,8 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped >
 
-
-    .time {
-    font-size: 13px;
-    color: #999;
-  }
-  
-  .bottom {
-    margin-top: 13px;
-    line-height: 12px;
-  }
-
-  .button {
-    padding: 0;
-    float: right;
-  }
-
-  .image {
-    width: 50px;
-    /* width: 100%; */
-    display: block;
-  }
-
-  .clearfix:before,
-  .clearfix:after {
-      display: table;
-      content: "";
-  }
-  
-  .clearfix:after {
-      clear: both
-  }
-/* dsad */
 
 .filetype {
   margin-top: 5px;
@@ -315,7 +270,6 @@ li {
 
 .line {
   background-color: #FFFFFF;
-  border-bottom: solid 1px #999999;
   width: 10rem;
   height: 10rem;
 }
@@ -328,13 +282,17 @@ li {
 }
 
 .main_content {
-  margin-left: 50%;
-  width: 80%;
-  height: 80%;
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  top: 5%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 60%;
 }
 
 .head_bg {
-  background-color: #ffc4c4;
+  background-color: #e6ebe7ab;
 }
 
 .head {
@@ -352,7 +310,7 @@ li {
 }
 
 .scroll_content {
-  height: 850px;
+  height: 700px;
   width: 100%;
   border: #ead9d9 solid 1px;
 }

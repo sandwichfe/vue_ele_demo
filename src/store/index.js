@@ -5,7 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        realPath: "D:",
+        realPath: "C:",
 
         goP:"http://192.168.31.215:6688/"
     },
