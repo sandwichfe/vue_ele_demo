@@ -3,11 +3,34 @@
 
     <div class="head_bg">
       <div class="head">
+        <!-- 词条 -->
         <el-breadcrumb class="bottom clearfix">
           <el-breadcrumb-item v-for="(h, index) in hs" :key="index" @click.native="gopage(h,index)">{{
               h.preName
             }}
           </el-breadcrumb-item>
+
+         <!-- 搜索 -->
+          <div class="keyword-select">
+           <el-select
+          v-model="value"
+          multiple
+          filterable
+         remote
+        reserve-keyword
+        placeholder="请输入关键词"
+        :remote-method="remoteMethod"
+       :loading="loading">
+          <el-option
+          v-for="item in options"
+         :key="item.value"
+         :label="item.label"
+         :value="item.value">
+             </el-option>
+           </el-select>
+          </div>
+
+          <!-- 切换 -->
           <div class="switch" @click="switchToAn()"> {{this.$store.state.realPath}}切换</div>
         </el-breadcrumb>
       </div>
@@ -17,16 +40,13 @@
     <div class="scroll_content">
       <vue-scroll :ops="ops" style="width:100%;height:100%" ref="vs">
         <div class="main_scroll_content">
-
-
           <ul>
             <li v-for="(c, index) in contents" :key="index" @click="go(c)" class="line">
               <div class="filetype">{{ c.type }}</div>
+              <div><img src="@/assets/img/folder.png" style="height:70px"></div>
               <div class="prename"> {{ c.preName }}</div>
             </li>
           </ul>
-          
-
         </div>
       </vue-scroll>
 
@@ -236,7 +256,18 @@ export default {
 
       })
 
-    }
+    },
+
+      // 搜索框内每一次输入都会执行的事件
+        remoteMethod(query) {
+        if (query !== '') {
+          setTimeout(() => {
+            console.log(query);
+          }, 200);
+        } else {
+         
+        }
+      },
 
   },
 
@@ -257,29 +288,28 @@ export default {
   margin-top: 5px;
   margin-bottom: 0px;
   color: black;
+  font-size: 16px;
+  line-height: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-ul {
-  list-style: none;
-}
-
-li {
-  width: 100%;
-  height: 50px;
-}
-
-.line {
-  background-color: #FFFFFF;
-  width: 10rem;
-  height: 10rem;
-}
 
 .switch {
   cursor: pointer;
-  line-height: 30px;
+  line-height: 40px;
   float: right;
   margin-right: 2%;;
 }
+
+.keyword-select {
+  cursor: pointer;
+  line-height: 30px;
+  float: left;
+  margin-left: 75%;;
+}
+
 
 .main_content {
   position: absolute;
@@ -297,8 +327,8 @@ li {
 
 .head {
   margin-left: auto;
-  line-height: 30px;
-  height: 30px;
+  line-height: 40px;
+  height: 40px;
   width: 99%;
 
 }
@@ -306,7 +336,7 @@ li {
 /* 里面就是一个一个的span */
 .head span {
   cursor: pointer;
-  line-height: 30px;
+  line-height: 40px;
 }
 
 .scroll_content {
@@ -316,23 +346,32 @@ li {
 }
 
 .main_scroll_content {
-  margin-left: auto;
-  width: 99%;
-  height: 800px;
+  width: 100%;
+}
+
+ul {
+  list-style: none;
+  display: flex;     
+  flex-wrap: wrap;     /** 子元素li超出换行 */
+  justify-content: flex-start; /**居中 从左往右 */
+}
+
+.main_scroll_content li {
+  /* flex: 1; */
+  height: 150px;
+  background-color: #ffffff;
+  margin-bottom: 2px;
+  margin-left: 1px;
+  margin-right: 1px;
+}
+
+.line {
+  background-color: #FFFFFF;
+  width: 10rem;
+  height: 10rem;
 }
 
 
-el-breadcrumb-item {
-  font-size: 16px;
-}
 
-
-.bottom {
-  font-size: 16px;
-  line-height: 12px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
 </style>
