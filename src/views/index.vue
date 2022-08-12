@@ -13,7 +13,7 @@
          <!-- 搜索 -->
           <div class="keyword-select">
            <el-select
-          v-model="value"
+          v-model="serachValue"
           multiple
           filterable
          remote
@@ -22,10 +22,10 @@
         :remote-method="remoteMethod"
        :loading="loading">
           <el-option
-          v-for="item in options"
-         :key="item.value"
-         :label="item.label"
-         :value="item.value">
+          v-for="item in hs"
+         :key="item.preName"
+         :label="item.preName"
+         :value="item.preName">
              </el-option>
            </el-select>
           </div>
@@ -43,7 +43,12 @@
           <ul>
             <li v-for="(c, index) in contents" :key="index" @click="go(c)" class="line">
               <div class="filetype">{{ c.type }}</div>
-              <div><img src="@/assets/img/folder.png" style="height:70px"></div>
+              <div v-if = "c.type=='folder'">
+                <svg-icon iconClass="dir-1" className="dirIcon" ></svg-icon>
+               </div>
+               <div v-if = "c.type=='file'">
+                <svg-icon iconClass="file-1" className="dirIcon" ></svg-icon>
+               </div>
               <div class="prename"> {{ c.preName }}</div>
             </li>
           </ul>
@@ -63,12 +68,12 @@
 
 <script>
 import {request} from '../network/request'   //引入自己封装的axios请求函数
-
 export default {
   name: "index",
+  components:{
+  },
   data() {
     return {
-      currentDate: new Date(),
       contents: [1, 2, 3],
       loading: false,
       currentPath: this.$store.state.realPath,
@@ -113,6 +118,7 @@ export default {
         },
       },
       sgo: true,
+      serachValue:''
     };
   },
   activated() {  //用户点击进入时执行的方法
@@ -285,14 +291,20 @@ export default {
 
 .prename {
   height: 30px;
+  line-height: 30px;
   margin-top: 5px;
   margin-bottom: 0px;
   color: black;
   font-size: 16px;
-  line-height: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.dirIcon {
+  width: 40px;
+  height: 40px;
+  margin-left: auto;
 }
 
 

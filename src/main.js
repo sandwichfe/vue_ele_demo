@@ -7,6 +7,10 @@ import store from './store'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
+// svg
+import('@/icons')
+
+
 /*//iview
 import ViewUI from 'view-design';
 import 'view-design/dist/styles/iview.css';*/
@@ -21,6 +25,7 @@ Vue.use(vuescroll, {
   ops: {}, // 在这里设置全局默认配置
   name: 'vue-scroll' // 在这里自定义组件名字，默认是vueScroll
 });
+
 
 Vue.config.productionTip = false
 
