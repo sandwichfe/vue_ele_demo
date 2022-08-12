@@ -44,10 +44,10 @@
             <li v-for="(c, index) in contents" :key="index" @click="go(c)" class="line">
               <div class="filetype">{{ c.type }}</div>
               <div v-if = "c.type=='folder'">
-                <svg-icon iconClass="dir-1" className="dirIcon" ></svg-icon>
+                <svg-icon iconClass="dir-1" className="dirIcon" class = 'svg' ></svg-icon>
                </div>
                <div v-if = "c.type=='file'">
-                <svg-icon iconClass="file-1" className="dirIcon" ></svg-icon>
+                <svg-icon iconClass="file-1" className="fileIcon" ></svg-icon>
                </div>
               <div class="prename"> {{ c.preName }}</div>
             </li>
@@ -301,7 +301,16 @@ export default {
   white-space: nowrap;
 }
 
+
 .dirIcon {
+  width: 40px;
+  height: 40px;
+  margin-left: auto;
+    fill:currentColor;
+    color:#c7cad4;
+}
+
+.fileIcon {
   width: 40px;
   height: 40px;
   margin-left: auto;
