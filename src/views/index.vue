@@ -4,12 +4,14 @@
     <div class="head_bg">
       <div class="head">
         <!-- 词条 -->
-        <el-breadcrumb class="bottom clearfix">
+      <div>
+      <el-breadcrumb class="bottom clearfix">
           <el-breadcrumb-item v-for="(h, index) in hs" :key="index" @click.native="gopage(h,index)">{{
               h.preName
             }}
           </el-breadcrumb-item>
-
+        </el-breadcrumb>
+      </div>
          <!-- 搜索 -->
           <div class="keyword-select">
            <el-select
@@ -32,7 +34,7 @@
 
           <!-- 切换 -->
           <div class="switch" @click="switchToAn()"> {{this.$store.state.realPath}}切换</div>
-        </el-breadcrumb>
+       
       </div>
 
     </div>
@@ -42,15 +44,18 @@
         <div class="main_scroll_content">
           <ul>
             <li v-for="(c, index) in contents" :key="index" @click="go(c)" class="line">
-              <div class="filetype">{{ c.type }}</div>
-              <div v-if = "c.type=='folder'">
-                <svg-icon iconClass="dir-1" className="dirIcon" class = 'svg' ></svg-icon>
-               </div>
-               <div v-if = "c.type=='file'">
-                <svg-icon iconClass="file-1" className="fileIcon" ></svg-icon>
-               </div>
-              <div class="prename"> {{ c.preName }}</div>
+                <div class= "file-li-item">
+                       <div class="filetype">{{ c.type }}</div>
+                       <div v-if = "c.type=='folder'">
+                       <svg-icon iconClass="dir-1" className="dirIcon" class = 'svg' ></svg-icon>
+                         </div>
+                       <div v-if = "c.type=='file'">
+                   <svg-icon iconClass="file-1" className="fileIcon" ></svg-icon>
+                    </div>
+                   <div class="prename"> {{ c.preName }}</div>
+                 </div>
             </li>
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
           </ul>
         </div>
       </vue-scroll>
@@ -247,20 +252,20 @@ export default {
       this.hs = [{type: "folder", path: this.$store.state.realPath, preName: "首页"}]
 
 
-      request({
-        method: 'post',
-        url: '/file/list2',
-        params: {
-        }
-      }).then(res => {
-        this.contents = res.data
+      // request({
+      //   method: 'post',
+      //   url: '/file/list2',
+      //   params: {
+      //   }
+      // }).then(res => {
+      //   this.contents = res.data
 
-        this.$message({
-          message: '你的ip为：'+res,
-          type: 'success'
-        });
+      //   this.$message({
+      //     message: '你的ip为：'+res,
+      //     type: 'success'
+      //   });
 
-      })
+      // })
 
     },
 
@@ -317,30 +322,6 @@ export default {
 }
 
 
-.switch {
-  cursor: pointer;
-  line-height: 40px;
-  float: right;
-  margin-right: 2%;;
-}
-
-.keyword-select {
-  cursor: pointer;
-  line-height: 30px;
-  float: left;
-  margin-left: 75%;;
-}
-
-
-.main_content {
-  position: absolute;
-  left: 50%;
-  right: 50%;
-  top: 5%;
-  transform: translateX(-50%);
-  width: 90%;
-  height: 60%;
-}
 
 .head_bg {
   background-color: #e6ebe7ab;
@@ -351,13 +332,36 @@ export default {
   line-height: 40px;
   height: 40px;
   width: 99%;
-
+  display: flex;
 }
 
 /* 里面就是一个一个的span */
 .head span {
   cursor: pointer;
   line-height: 40px;
+}
+
+
+.keyword-select {
+  margin-left: 70%;
+  cursor: pointer;
+  line-height: 40px;
+}
+
+.switch {
+  cursor: pointer;
+  line-height: 40px;
+   margin-left: 3%;
+}
+
+.main_content {
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  top: 5%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 100%;
 }
 
 .scroll_content {
@@ -371,25 +375,31 @@ export default {
 }
 
 ul {
+  /* background-color: rgb(95, 68, 68); */
   list-style: none;
   display: flex;     
   flex-wrap: wrap;     /** 子元素li超出换行 */
-  justify-content: flex-start; /**居中 从左往右 */
+  justify-content: space-between; /**居中 从左往右 */
 }
 
 .main_scroll_content li {
-  /* flex: 1; */
-  height: 150px;
-  background-color: #ffffff;
-  margin-bottom: 2px;
-  margin-left: 1px;
-  margin-right: 1px;
+  height: 120px;
 }
 
+ul>i {
+  width: 10rem;
+  background-color: #a5d3e0;
+  /* margin-right: 30px;s */
+}
 .line {
-  background-color: #FFFFFF;
+  background-color: #a5d3e0;
   width: 10rem;
   height: 10rem;
+}
+
+.file-li-item {
+  width: 80%;
+  margin-left: auto;
 }
 
 
