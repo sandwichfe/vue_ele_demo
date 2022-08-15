@@ -3,7 +3,7 @@
     <!-- 路径词条 -->
     <div>
       <el-breadcrumb class="bread">
-        <el-breadcrumb-item
+        <el-breadcrumb-item class="bread-item"  
           v-for="(h, index) in hs"
           :key="index"
           @click.native="gopage(h, index)"
@@ -88,7 +88,7 @@
       </vue-scroll>
     </div>
 
-    <el-backtop target=".vs" visibilityHeight=1 style="z-index: 99999;"></el-backtop>
+    <el-backtop target=".vs"  style="z-index: 99999;"></el-backtop>
   </div>
 </template>
 
@@ -348,18 +348,15 @@ export default {
   justify-content: space-between;
 }
 
-/* 里面就是一个一个的span */
-.head span {
-  cursor: pointer;
-  line-height: 40px;
-}
-
 .bread {
   line-height: 30px;
 }
 
-.keyword-select {
+.bread-item {
   cursor: pointer;
+}
+
+.keyword-select {
   line-height: 40px;
   flex: 12;
 }
@@ -369,6 +366,7 @@ export default {
   /* flex: 1; */
   flex-shrink: 0;
   margin-right: 5px;
+  cursor: pointer;
 }
 
 .show-box {
@@ -377,6 +375,7 @@ export default {
 }
 
 .show-box button {
+  cursor: pointer;
   border: 0;  /* 清除默认边框 */
   outline: none;
   background-color: transparent;   /*清除默认背景 */
