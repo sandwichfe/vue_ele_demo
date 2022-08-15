@@ -9,7 +9,7 @@ function resolve (dir) {
 module.exports = {
     lintOnSave: false,
     devServer: {
-        host: '192.168.31.215', // ip
+        host: '192.168.8.68', // ip
         port: 6688, // 设置端口号
         https: false, // https:{type:Boolean}
         open: true, //配置自动启动浏览器
