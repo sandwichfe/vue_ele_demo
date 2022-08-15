@@ -23,15 +23,7 @@
           reserve-keyword
           placeholder="请输入关键词"
           :remote-method="remoteMethod"
-          :loading="loading"
         >
-          <el-option
-            v-for="item in hs"
-            :key="item.preName"
-            :label="item.preName"
-            :value="item.preName"
-          >
-          </el-option>
         </el-select>
       </div>
 
@@ -41,23 +33,25 @@
       </div>
       <!-- 样式切换 -->
       <div class="show-box" @click="switchList()">
-        <svg-icon
-          iconClass="list-icon"
-          className="list-btn-switch"
-          v-if="listType == false"
-        ></svg-icon>
-        <svg-icon
-          iconClass="app-icon"
-          className="list-btn-switch"
-          v-if="listType == true"
-        ></svg-icon>
+        <button>
+          <svg-icon
+            iconClass="list-icon"
+            className="list-btn-switch"
+            v-if="listType == false"
+          ></svg-icon>
+          <svg-icon
+            iconClass="app-icon"
+            className="list-btn-switch"
+            v-if="listType == true"
+          ></svg-icon>
+        </button>
       </div>
     </div>
 
-    <div class="scroll_content" >
-      <vue-scroll :ops="ops" style="width: 100%; height: 100%" ref="vs">
+    <div class="scroll_content">
+      <vue-scroll :ops="ops" style="width: 100%; height: 100%" ref="vs" class="vs">
         <div class="main_scroll_content">
-          <ul  :class="listType == true ? 'list-file-ul' : ''">
+          <ul :class="listType == true ? 'list-file-ul' : ''">
             <li
               v-for="(c, index) in contents"
               :key="index"
@@ -65,8 +59,7 @@
               class="line"
             >
               <div class="file-li-item">
-                <div class="filetype">{{ c.type }}</div>
-                <div>
+                <div class="file-svg-icon">
                   <svg-icon
                     v-if="c.type == 'folder'"
                     iconClass="dir-1"
@@ -91,12 +84,11 @@
             ><i></i
             ><i></i>
           </ul>
-
         </div>
       </vue-scroll>
     </div>
 
-    <el-backtop></el-backtop>
+    <el-backtop target=".vs" visibilityHeight=1 style="z-index: 99999;"></el-backtop>
   </div>
 </template>
 
@@ -319,11 +311,6 @@ export default {
   height: 100%;
 }
 
-.filetype {
-  margin-top: 5px;
-  color: #c5a3a3;
-}
-
 .prename {
   height: 30px;
   line-height: 30px;
@@ -359,7 +346,6 @@ export default {
   background-color: #e6ebe7ab;
   display: flex;
   justify-content: space-between;
-
 }
 
 /* 里面就是一个一个的span */
@@ -381,13 +367,19 @@ export default {
 .switch {
   line-height: 40px;
   /* flex: 1; */
-  flex-shrink:0;
+  flex-shrink: 0;
   margin-right: 5px;
 }
 
 .show-box {
   /* flex: 1; */
-  flex-shrink:0;
+  flex-shrink: 0;
+}
+
+.show-box button {
+  border: 0;  /* 清除默认边框 */
+  outline: none;
+  background-color: transparent;   /*清除默认背景 */
 }
 
 .list-btn-switch {
@@ -415,12 +407,9 @@ ul {
 
 ul > i {
   width: 10rem;
-  /* background-color: #a5d3e0; */
-  /* margin-right: 30px;s */
 }
 
 .line {
-  /* background-color: #a5d3e0; */
   width: 10rem;
   height: 10rem;
 }
@@ -428,6 +417,10 @@ ul > i {
 .file-li-item {
   width: 80%;
   margin-left: auto;
+}
+
+.file-svg-icon {
+  margin-top: 5px;
 }
 
 .main_scroll_content li:hover .svg-file-icon {
@@ -438,10 +431,6 @@ ul > i {
 /* list style */
 .list-file-ul {
   display: flex;
-  transition: all 0.8s;
-}
-.list-file-ul .filetype {
-  display: none;
 }
 
 .list-file-ul .prename {
@@ -458,6 +447,14 @@ ul > i {
   display: flex;
   height: 40px;
   margin-top: 10px;
+}
+
+.list-file-ul .file-svg-icon {
+  margin-top: 0;
+}
+
+.list-file-ul li:hover .prename {
+  color: #72c8c4;
 }
 
 /* list style end */
