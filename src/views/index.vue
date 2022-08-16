@@ -1,5 +1,6 @@
 <template>
   <div class="main_content">
+
     <!-- 路径词条 -->
     <div>
       <el-breadcrumb class="bread">
@@ -14,19 +15,13 @@
 
     <div class="head head_bg">
       <!-- 搜索 -->
-      <div class="keyword-select" v-if="1 == 1">
-        <el-select
-          v-model="serachValue"
-          multiple
-          filterable
-          remote
-          reserve-keyword
-          placeholder="请输入关键词"
-          :remote-method="remoteMethod"
-        >
-        </el-select>
+      <div class="keyword-select" >
+          <el-input v-model="serachValue" 
+          placeholder="请输入内容"
+          ref = 'keywordSelect'
+          clearable
+          ></el-input>
       </div>
-
       <!-- 盘符切换 -->
       <div class="switch" @click="switchToAn()">
         {{ this.$store.state.realPath }}切换
@@ -49,7 +44,7 @@
     </div>
 
     <div class="scroll_content">
-      <vue-scroll :ops="ops" style="width: 100%; height: 100%" ref="vs" class="vs">
+      <vue-scroll :ops="ops" style="width: 100%; height: 100%" ref = "vs">
         <div class="main_scroll_content">
           <ul :class="listType == true ? 'list-file-ul' : ''">
             <li
@@ -88,11 +83,18 @@
       </vue-scroll>
     </div>
 
-    <el-backtop target=".vs"  style="z-index: 99999;"></el-backtop>
   </div>
 </template>
 
 <script>
+// 节流函数
+const delay = (function() {
+  let timer = 0;
+  return function(callback, ms) {
+    clearTimeout(timer);
+    timer = setTimeout(callback, ms);
+  };
+})();
 import { request } from "../network/request"; //引入自己封装的axios请求函数
 export default {
   name: "index",
@@ -149,6 +151,14 @@ export default {
       serachValue: "",
     };
   },
+    watch: {
+  //watch serachValue change
+    serachValue() {
+      delay(() => {
+        this.remoteMethod(this.serachValue);
+      }, 300);
+    },
+  },
   activated() {
     //用户点击进入时执行的方法
     console.log("init");
@@ -160,15 +170,7 @@ export default {
   },
 
   created() {
-    request({
-      method: "post",
-      url: "/file/list1",
-      params: {
-        path: this.$store.state.realPath,
-      },
-    }).then((res) => {
-      this.contents = res.data;
-    });
+      this.initList();
   },
   methods: {
     go(content) {
@@ -246,6 +248,8 @@ export default {
         this.loading = false;
         // 滚动条位置 设置
         this.$refs["vs"].scrollIntoView(".main_scroll_content", 0);
+         // 搜索内容清空
+         this.serachValue = "";
       });
     },
 
@@ -257,34 +261,11 @@ export default {
       }
       this.$store.commit("changeP", this.sgo);
 
-      request({
-        method: "post",
-        url: "/file/list1",
-        params: {
-          path: this.$store.state.realPath,
-        },
-      }).then((res) => {
-        this.contents = res.data;
-      });
+      this.initList();
       this.currentPath = this.$store.state.realPath;
       this.hs = [
         { type: "folder", path: this.$store.state.realPath, preName: "首页" },
       ];
-
-      // request({
-      //   method: 'post',
-      //   url: '/file/list2',
-      //   params: {
-      //   }
-      // }).then(res => {
-      //   this.contents = res.data
-
-      //   this.$message({
-      //     message: '你的ip为：'+res,
-      //     type: 'success'
-      //   });
-
-      // })
     },
 
     // 搜索框内每一次输入都会执行的事件
@@ -292,14 +273,42 @@ export default {
       if (query !== "") {
         setTimeout(() => {
           console.log(query);
+           this.loading = true;
+              request({
+                method: "post",
+                url: "/file/list1",
+                params: {
+                 path: this.$store.state.realPath,
+                 keyword:query
+                 },
+    }).then((res) => {
+       this.loading = false;
+      this.contents = res.data;
+    });
         }, 200);
       } else {
+        this.loading = true;
+        this.initList();
+        // this.loading = false;
       }
     },
 
     switchList() {
       this.listType = !this.listType;
     },
+
+    initList(){
+        request({
+                method: "post",
+                url: "/file/list1",
+                params: {
+                 path: this.$store.state.realPath,
+                 },
+    }).then((res) => {
+      this.contents = res.data;
+    });
+    }
+
   },
 };
 </script>
