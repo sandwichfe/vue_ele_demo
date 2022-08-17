@@ -22,5 +22,6 @@ export default {
   fill: currentColor;
   color: #c8dae2;
   opacity: 0.4;
+  cursor: pointer;
 }
 </style>

@@ -48,7 +48,9 @@
     v-loading="loading"
     element-loading-text="o(*≧▽≦)ツ加载中~"
     >
-      <vue-scroll :ops="ops" @handle-scroll="handleScroll" style="width: 100%; height: 100%" ref="vs" >
+      <vue-scroll :ops="ops" @handle-scroll="handleScroll" 
+      style="width: 100%; height: 100%" 
+      ref="vs"  v-if="this.contents&&this.contents.length>0">
         <div class="main_scroll_content">
           <ul :class="listType == true ? 'list-file-ul' : ''">
             <li
@@ -85,8 +87,14 @@
           </ul>
         </div>
       </vue-scroll>
-    </div>  
 
+      <el-empty description="(ง •̀_•́)ง没有数据了" 
+      v-else 
+      image=""
+      :image-size="200"
+      class="empty-msg-box"></el-empty>
+
+    </div>  
     <back-top v-show="backTopVisible" @click.native="backToTop()"></back-top>
 
   </div>
@@ -195,7 +203,9 @@ export default {
           this.currentPath = newGo;
           this.loading = false;
           //新进子目录滚动条归到最前面  滚到某个div的位置  过渡速度为0
-          this.$refs["vs"].scrollIntoView(".main_scroll_content", 0);
+          if(this.$refs["vs"]){
+            this.$refs["vs"].scrollIntoView(".main_scroll_content", 0);
+          }
           // 搜索内容清空
           this.serachValue = "";
         });
@@ -235,7 +245,9 @@ export default {
         this.contents = res.data;
         this.loading = false;
         // 滚动条位置 设置
-        this.$refs["vs"].scrollIntoView(".main_scroll_content", 0);
+         if(this.$refs["vs"]){  
+            this.$refs["vs"].scrollIntoView(".main_scroll_content", 0);
+          }
         // 搜索内容清空
         this.serachValue = "";
       });
@@ -262,7 +274,6 @@ export default {
     remoteMethod(query) {
       if (query !== "") {
         setTimeout(() => {
-          console.log(query);
           this.loading = true;
           getFileList(this.currentPath, query).then((res) => {
             this.contents = res.data;
@@ -432,6 +443,10 @@ ul > i {
 .main_scroll_content li:hover .svg-file-icon {
   scale: 1.1 1.1;
   transition: all 0.8s;
+}
+
+.empty-msg-box {
+  margin-top: 150px;
 }
 
 /* list style */
