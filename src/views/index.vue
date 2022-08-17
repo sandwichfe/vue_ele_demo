@@ -1,10 +1,10 @@
 <template>
   <div class="main_content">
-
     <!-- 路径词条 -->
     <div>
       <el-breadcrumb class="bread">
-        <el-breadcrumb-item class="bread-item"  
+        <el-breadcrumb-item
+          class="bread-item"
           v-for="(h, index) in hs"
           :key="index"
           @click.native="gopage(h, index)"
@@ -15,12 +15,13 @@
 
     <div class="head head_bg">
       <!-- 搜索 -->
-      <div class="keyword-select" >
-          <el-input v-model="serachValue" 
+      <div class="keyword-select">
+        <el-input
+          v-model="serachValue"
           placeholder="请输入内容"
-          ref = 'keywordSelect'
+          ref="keywordSelect"
           clearable
-          ></el-input>
+        ></el-input>
       </div>
       <!-- 盘符切换 -->
       <div class="switch" @click="switchToAn()">
@@ -43,8 +44,12 @@
       </div>
     </div>
 
-    <div class="scroll_content">
-      <vue-scroll :ops="ops" style="width: 100%; height: 100%" ref = "vs">
+    <div class="scroll_content"  
+    v-loading="loading"
+    element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="">
+      <vue-scroll :ops="ops" style="width: 100%; height: 100%" ref="vs">
         <div class="main_scroll_content">
           <ul :class="listType == true ? 'list-file-ul' : ''">
             <li
@@ -82,20 +87,19 @@
         </div>
       </vue-scroll>
     </div>
-
   </div>
 </template>
 
 <script>
 // 节流函数
-const delay = (function() {
+const delay = (function () {
   let timer = 0;
-  return function(callback, ms) {
+  return function (callback, ms) {
     clearTimeout(timer);
     timer = setTimeout(callback, ms);
   };
 })();
-import { request } from "../network/request"; //引入自己封装的axios请求函数
+import { getFileList } from "@/network/base"; //引入自己封装的axios请求函数
 export default {
   name: "index",
   components: {},
@@ -151,8 +155,8 @@ export default {
       serachValue: "",
     };
   },
-    watch: {
-  //watch serachValue change
+  watch: {
+    //watch serachValue change
     serachValue() {
       delay(() => {
         this.remoteMethod(this.serachValue);
@@ -168,13 +172,11 @@ export default {
     //离开时保存
     console.log("离开了");
   },
-
   created() {
-      this.initList();
+    this.initList();
   },
   methods: {
     go(content) {
-      this.loading = true;
       var type = content.type;
       var path = content.path;
       var preName = content.preName;
@@ -182,22 +184,16 @@ export default {
       var newGo = this.currentPath + "\\" + preName;
       if (type === "folder") {
         //调接口  进入此文件夹的内容
-        request({
-          method: "post",
-          url: "/file/list1",
-          params: {
-            path: newGo,
-          },
-        }).then((res) => {
+        this.loading = true;
+        getFileList(newGo, null).then((res) => {
           this.contents = res.data;
-          //关闭loading动画
-          this.loading = false;
           this.hs.push(content);
-
           this.currentPath = newGo;
-
+          this.loading = false;
           //新进子目录滚动条归到最前面  滚到某个div的位置  过渡速度为0
           this.$refs["vs"].scrollIntoView(".main_scroll_content", 0);
+          // 搜索内容清空
+          this.serachValue = "";
         });
       } else if (type === "file") {
         //正斜杠替换反斜杠
@@ -205,7 +201,6 @@ export default {
         //前缀路径替换
         var zreg = new RegExp("this.$store.state.realPath" + "/", "g"); //g代表全部
         var aba = z.replace(zreg, "");
-        //this.$router.push('http://localhost:6688/' + aba)
         var gohref = this.$store.state.goP + aba;
 
         //正斜杠替换反斜杠
@@ -220,7 +215,6 @@ export default {
         var zreg22 = new RegExp("this.$store.state.realPath" + "/", "g"); //g代表全部
         var aba22 = z22.replace(zreg22, "");
         window.open(aba22, "_blank");
-        this.loading = false;
       }
     },
 
@@ -229,31 +223,22 @@ export default {
       //this.hs =
       var fds = this.hs.slice(0, index + 1);
       this.hs = fds;
-      this.loading = false;
-      var path = content.path;
-      var preName = content.preName;
-
       this.currentPath = content.path;
 
       //调接口  进入此文件夹的内容
-      request({
-        method: "post",
-        url: "/file/list1",
-        params: {
-          path: this.currentPath,
-        },
-      }).then((res) => {
+      this.loading = true;
+      getFileList(this.currentPath, null).then((res) => {
         this.contents = res.data;
-        //关闭loading动画
         this.loading = false;
         // 滚动条位置 设置
         this.$refs["vs"].scrollIntoView(".main_scroll_content", 0);
-         // 搜索内容清空
-         this.serachValue = "";
+        // 搜索内容清空
+        this.serachValue = "";
       });
     },
 
     switchToAn() {
+      this.loading = true;
       if (this.sgo == true) {
         this.sgo = false;
       } else if (this.sgo == false) {
@@ -266,6 +251,7 @@ export default {
       this.hs = [
         { type: "folder", path: this.$store.state.realPath, preName: "首页" },
       ];
+      this.loading = false;
     },
 
     // 搜索框内每一次输入都会执行的事件
@@ -273,23 +259,18 @@ export default {
       if (query !== "") {
         setTimeout(() => {
           console.log(query);
-           this.loading = true;
-              request({
-                method: "post",
-                url: "/file/list1",
-                params: {
-                 path: this.$store.state.realPath,
-                 keyword:query
-                 },
-    }).then((res) => {
-       this.loading = false;
-      this.contents = res.data;
-    });
+          this.loading = true;
+          getFileList(this.currentPath, query).then((res) => {
+            this.contents = res.data;
+            this.loading = false;
+          });
         }, 200);
       } else {
         this.loading = true;
-        this.initList();
-        // this.loading = false;
+        getFileList(this.currentPath, null).then((res) => {
+          this.contents = res.data;
+          this.loading = false;
+        });
       }
     },
 
@@ -297,18 +278,11 @@ export default {
       this.listType = !this.listType;
     },
 
-    initList(){
-        request({
-                method: "post",
-                url: "/file/list1",
-                params: {
-                 path: this.$store.state.realPath,
-                 },
-    }).then((res) => {
-      this.contents = res.data;
-    });
-    }
-
+    initList() {
+      getFileList(this.$store.state.realPath, null).then((res) => {
+        this.contents = res.data;
+      });
+    },
   },
 };
 </script>
@@ -385,9 +359,9 @@ export default {
 
 .show-box button {
   cursor: pointer;
-  border: 0;  /* 清除默认边框 */
+  border: 0; /* 清除默认边框 */
   outline: none;
-  background-color: transparent;   /*清除默认背景 */
+  background-color: transparent; /*清除默认背景 */
 }
 
 .list-btn-switch {
