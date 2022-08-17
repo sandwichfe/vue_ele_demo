@@ -48,7 +48,7 @@
     v-loading="loading"
     element-loading-text="o(*≧▽≦)ツ加载中~"
     >
-      <vue-scroll :ops="ops" style="width: 100%; height: 100%" ref="vs">
+      <vue-scroll :ops="ops" @handle-scroll="handleScroll" style="width: 100%; height: 100%" ref="vs" >
         <div class="main_scroll_content">
           <ul :class="listType == true ? 'list-file-ul' : ''">
             <li
@@ -85,7 +85,10 @@
           </ul>
         </div>
       </vue-scroll>
-    </div>
+    </div>  
+
+    <back-top v-show="backTopVisible" @click.native="backToTop()"></back-top>
+
   </div>
 </template>
 
@@ -99,14 +102,16 @@ const delay = (function () {
   };
 })();
 import { getFileList } from "@/network/base"; //引入自己封装的axios请求函数
+import BackTop from '../components/backTop/BackTop.vue';
 export default {
   name: "index",
-  components: {},
+  components: {BackTop},
   data() {
     return {
       listType: true,
       contents: [1, 2, 3],
       loading: false,
+      backTopVisible: false,
       currentPath: this.$store.state.realPath,
       hs: [
         { type: "folder", path: this.$store.state.realPath, preName: "首页" },
@@ -282,6 +287,22 @@ export default {
         this.contents = res.data;
       });
     },
+
+
+     handleScroll(vertical, horizontal, nativeEvent) {
+                // console.log(vertical.scrollTop)
+        // 滚动超过400 就出现backtop图标
+          if(vertical.scrollTop>=400){
+            this.backTopVisible = true;
+          }else{
+            this.backTopVisible = false;
+          }
+     },
+
+     backToTop(){
+        this.$refs["vs"].scrollIntoView(".main_scroll_content", 100);
+     }
+
   },
 };
 </script>
@@ -409,7 +430,7 @@ ul > i {
 }
 
 .main_scroll_content li:hover .svg-file-icon {
-  scale: 1.2 1.2;
+  scale: 1.1 1.1;
   transition: all 0.8s;
 }
 

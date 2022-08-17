@@ -1,7 +1,10 @@
 <template>
     <div class="back-top">
 
-        <img src="~assets/img/common/top.png" >
+        <svg-icon
+            iconClass="backtop"
+            className="bt-icon"
+          ></svg-icon>
 
 
     </div>
@@ -16,10 +19,10 @@
 <style scoped>
     .back-top {
         position: fixed;
-        right: 8px;
-        bottom: 55px;
+        right: 12%;
+        bottom: 5rem;
     }
-    .back-top img {
+    .back-top .bt-icon {
         width: 43px;
         height: 43px;
     }
