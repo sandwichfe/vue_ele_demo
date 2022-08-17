@@ -46,9 +46,8 @@
 
     <div class="scroll_content"  
     v-loading="loading"
-    element-loading-text="拼命加载中"
-    element-loading-spinner="el-icon-loading"
-    element-loading-background="">
+    element-loading-text="o(*≧▽≦)ツ加载中~"
+    >
       <vue-scroll :ops="ops" style="width: 100%; height: 100%" ref="vs">
         <div class="main_scroll_content">
           <ul :class="listType == true ? 'list-file-ul' : ''">
@@ -373,6 +372,10 @@ export default {
 .scroll_content {
   height: 700px;
   border: #ead9d9 solid 1px;
+}
+
+.loading-icon {
+    background: #000;
 }
 
 ul {
