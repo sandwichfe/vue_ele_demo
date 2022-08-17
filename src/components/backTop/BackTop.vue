@@ -12,9 +12,9 @@ export default {
 
 <style scoped>
 .back-top {
-  position: fixed;
-  right: 12%;
-  bottom: 80px;
+  position: absolute;
+  right: 8%;
+  bottom: 60px;
 }
 .back-top .bt-icon {
   width: 43px;

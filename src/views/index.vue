@@ -291,6 +291,7 @@ export default {
 
     switchList() {
       this.listType = !this.listType;
+      this.$refs["vs"].scrollIntoView(".main_scroll_content", 0);
     },
 
     initList() {
@@ -323,6 +324,7 @@ export default {
   width: 90%;
   margin: 0 auto;
   height: 100%;
+  position: relative;
 }
 
 .prename {

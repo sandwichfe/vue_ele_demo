@@ -15,4 +15,11 @@
         width: 100%;
         height: 100%;
     }
+    /*清除点击时的高亮颜色*/
+    a,
+    input,
+    button,
+    div {
+     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
 </style>
