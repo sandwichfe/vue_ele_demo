@@ -2,15 +2,13 @@
   <div class="main_content">
     <!-- 路径词条 -->
     <div>
-      <el-breadcrumb class="bread">
-        <el-breadcrumb-item
-          class="bread-item"
-          v-for="(h, index) in hs"
+      <vue-scroll :ops="pathOps" ref="pathVs" @handle-resize="handleResize">
+      <div class="url-path">
+        <div v-for="(h, index) in hs"
           :key="index"
-          @click.native="gopage(h, index)"
-          >{{ h.preName }}</el-breadcrumb-item
-        >
-      </el-breadcrumb>
+          @click="gopage(h, index)">{{ h.preName }}</div>
+      </div>
+      </vue-scroll>
     </div>
 
     <div class="head head_bg">
@@ -163,6 +161,29 @@ export default {
           disable: false, //是否禁用滚动条。
         },
       },
+      pathOps:{
+         rail: {
+          background: "#ffffff", //轨道的背景色。
+          opacity: 0.5, //轨道的透明度。 0是透明，1是不透明
+          size: "6px", //轨道的尺寸。
+          specifyBorderRadius: false, //是否指定轨道的 borderRadius， 如果不那么将会自动设置。
+          gutterOfEnds: null,
+          gutterOfSide: "0px", //距离容器的距离
+          keepShow: false, //是否即使 bar 不存在的情况下也保持显示。
+        },
+        bar: {
+          showDelay: 500, //在鼠标离开容器后多长时间隐藏滚动条。
+          onlyShowBarOnScroll: true, //是否只在滚动时显示 bar。
+          keepShow: false, //滚动条是否保持显示。
+          background: "#d9dcda", //滚动条背景色。
+          opacity: 1, //滚动条透明度。
+          hoverStyle: false,
+          specifyBorderRadius: false, //是否指定滚动条的 borderRadius， 如果不那么和轨道的保持一致。
+          minSize: false, //为 bar 设置一个最小尺寸, 从 0 到 1. 如 0.3, 代表 30%.
+          size: "2px", //bar 的尺寸。
+          disable: true, //是否禁用滚动条。
+        },
+      },
       sgo: true,
       serachValue: "",
     };
@@ -313,7 +334,28 @@ export default {
 
      backToTop(){
         this.$refs["vs"].scrollIntoView(".main_scroll_content", 100);
-     }
+     },
+
+    /**
+     *  使url path的滚动条到最后
+     */
+     scrollLast(){
+        this.$refs["pathVs"].scrollTo(
+        {
+       x: "100%"
+       },
+       0,
+       "easeInQuad"
+          );
+     },
+
+      /**
+       * url path的内容发生变化后 滚动条滚到最后
+       */
+      handleResize() {
+                // console.log('content has resized!')
+                this.scrollLast();
+            }
 
   },
 };
@@ -364,12 +406,20 @@ export default {
   justify-content: space-between;
 }
 
-.bread {
+.url-path {
   line-height: 30px;
+  display: flex;
+  word-break:keep-all;/* 内容/字不换行 */
+  white-space:nowrap;/* 不换行 */
 }
 
-.bread-item {
-  cursor: pointer;
+.url-path div {
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.url-path div:after {
+ content: " /";
 }
 
 .keyword-select {
