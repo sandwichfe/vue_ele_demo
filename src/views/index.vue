@@ -109,6 +109,7 @@ const delay = (function () {
 })();
 import { getFileList } from "@/network/base"; //引入自己封装的axios请求函数
 import BackTop from '../components/backTop/BackTop.vue';
+import {love} from '@/utils/love'
 export default {
   name: "index",
   components: {BackTop},
@@ -207,6 +208,9 @@ export default {
   },
   created() {
     this.initList();
+  },
+  mounted () {
+    love();
   },
   methods: {
     go(content) {
@@ -407,6 +411,7 @@ export default {
 }
 
 .url-path {
+  color: #42859396;
   line-height: 30px;
   display: flex;
   word-break:keep-all;/* 内容/字不换行 */
@@ -414,6 +419,7 @@ export default {
 }
 
 .url-path div {
+  cursor: pointer;
   margin-left: 4px;
   margin-right: 4px;
 }
