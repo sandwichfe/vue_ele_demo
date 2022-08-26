@@ -3,11 +3,11 @@
     <!-- 路径词条 -->
     <div>
       <vue-scroll :ops="pathOps" ref="pathVs" @handle-resize="handleResize">
-      <div class="url-path">
-        <div v-for="(h, index) in hs"
-          :key="index"
-          @click="gopage(h, index)">{{ h.preName }}</div>
-      </div>
+        <div class="url-path">
+          <div v-for="(h, index) in hs" :key="index" @click="gopage(h, index)">
+            {{ h.preName }}
+          </div>
+        </div>
       </vue-scroll>
     </div>
 
@@ -21,34 +21,30 @@
           clearable
         ></el-input>
       </div>
-      <!-- 盘符切换 -->
-      <div class="switch" @click="switchToAn()">
-        {{ this.$store.state.realPath }}切换
-      </div>
       <!-- 样式切换 -->
-      <div class="show-box" @click="switchList()">
+      <div class="back-box" @click="backToPrevious">
         <button>
           <svg-icon
-            iconClass="list-icon"
+            iconClass="back_3"
             className="list-btn-switch"
-            v-if="listType == false"
-          ></svg-icon>
-          <svg-icon
-            iconClass="app-icon"
-            className="list-btn-switch"
-            v-if="listType == true"
           ></svg-icon>
         </button>
       </div>
     </div>
 
-    <div class="scroll_content"  
-    v-loading="loading"
-    element-loading-text="o(*≧▽≦)ツ加载中~"
+    <div
+      :style="{height: scrollerHeight}"
+      class="scroll_content"
+      v-loading="loading"
+      element-loading-text="o(*≧▽≦)ツ加载中~"
     >
-      <vue-scroll :ops="ops" @handle-scroll="handleScroll" 
-      style="width: 100%; height: 100%" 
-      ref="vs"  v-if="this.contents&&this.contents.length>0">
+      <vue-scroll
+        :ops="ops"
+        @handle-scroll="handleScroll"
+        style="width: 100%; height: 100%"
+        ref="vs"
+        v-if="this.contents && this.contents.length > 0"
+      >
         <div class="main_scroll_content">
           <ul :class="listType == true ? 'list-file-ul' : ''">
             <li
@@ -86,15 +82,32 @@
         </div>
       </vue-scroll>
 
-      <el-empty description="(ง •̀_•́)ง没有数据了" 
-      v-else 
-      image=""
-      :image-size="200"
-      class="empty-msg-box"></el-empty>
-
-    </div>  
+      <el-empty
+        description="(ง •̀_•́)ง没有数据了"
+        v-else
+        image=""
+        :image-size="200"
+        class="empty-msg-box"
+      ></el-empty>
+    </div>
     <back-top v-show="backTopVisible" @click.native="backToTop()"></back-top>
-
+    <div class="util-col">
+      <!-- 样式切换 -->
+      <div class="show-box" @click="switchList()">
+        <button>
+          <svg-icon
+            iconClass="list-icon"
+            className="list-btn-switch"
+            v-if="listType == false"
+          ></svg-icon>
+          <svg-icon
+            iconClass="app-icon"
+            className="list-btn-switch"
+            v-if="listType == true"
+          ></svg-icon>
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -108,21 +121,19 @@ const delay = (function () {
   };
 })();
 import { getFileList } from "@/network/base"; //引入自己封装的axios请求函数
-import BackTop from '../components/backTop/BackTop.vue';
-import {love} from '@/utils/love'
+import BackTop from "../components/backTop/BackTop.vue";
+import { love } from "@/utils/love";
 export default {
   name: "index",
-  components: {BackTop},
+  components: { BackTop },
   data() {
     return {
       listType: true,
       contents: [1, 2, 3],
       loading: false,
       backTopVisible: false,
-      currentPath: this.$store.state.realPath,
-      hs: [
-        { type: "folder", path: this.$store.state.realPath, preName: "首页" },
-      ],
+      currentPath: '', 
+      hs: [{ type: "folder", path: this.$store.state.realPath, preName: "首页" }],
       ops: {
         vuescroll: {
           mode: "native", //模式:pc natice 移动端是slice
@@ -162,8 +173,8 @@ export default {
           disable: false, //是否禁用滚动条。
         },
       },
-      pathOps:{
-         rail: {
+      pathOps: {
+        rail: {
           background: "#ffffff", //轨道的背景色。
           opacity: 0.5, //轨道的透明度。 0是透明，1是不透明
           size: "6px", //轨道的尺寸。
@@ -185,10 +196,15 @@ export default {
           disable: true, //是否禁用滚动条。
         },
       },
-      sgo: true,
       serachValue: "",
     };
   },
+    computed: {
+      // 滚动区高度 
+      scrollerHeight: function() {
+      return (document.documentElement.clientHeight - 30-40-41-5) + 'px'; //自定义高度需求  不知道这多的5px哪来的..
+       }
+     },
   watch: {
     //watch serachValue change
     serachValue() {
@@ -209,7 +225,7 @@ export default {
   created() {
     this.initList();
   },
-  mounted () {
+  mounted() {
     love();
   },
   methods: {
@@ -219,6 +235,10 @@ export default {
       var preName = content.preName;
 
       var newGo = this.currentPath + "\\" + preName;
+      // 此时是root路径不用加斜杠
+      if(this.currentPath==""){
+        newGo = preName;
+      }
       if (type === "folder") {
         //调接口  进入此文件夹的内容
         this.loading = true;
@@ -228,7 +248,7 @@ export default {
           this.currentPath = newGo;
           this.loading = false;
           //新进子目录滚动条归到最前面  滚到某个div的位置  过渡速度为0
-          if(this.$refs["vs"]){
+          if (this.$refs["vs"]) {
             this.$refs["vs"].scrollIntoView(".main_scroll_content", 0);
           }
           // 搜索内容清空
@@ -259,34 +279,35 @@ export default {
 
     gopage(content, index) {
       //跳到点击位置的索引   index 后面的内容直接干掉
-      //this.hs =
       var fds = this.hs.slice(0, index + 1);
       this.hs = fds;
-      this.currentPath = content.path;
 
+      this.currentPath = content.path;
       //调接口  进入此文件夹的内容
       this.loading = true;
       getFileList(this.currentPath, null).then((res) => {
         this.contents = res.data;
         this.loading = false;
         // 滚动条位置 设置
-         if(this.$refs["vs"]){  
-            this.$refs["vs"].scrollIntoView(".main_scroll_content", 0);
-          }
+        if (this.$refs["vs"]) {
+          this.$refs["vs"].scrollIntoView(".main_scroll_content", 0);
+        }
         // 搜索内容清空
         this.serachValue = "";
       });
+
+      // 回到了root 路径
+      if(content.path=="root"){
+         this.currentPath = "";
+      }
+
     },
 
+    /**
+     * 切换盘符
+     */
     switchToAn() {
-      this.loading = true;
-      if (this.sgo == true) {
-        this.sgo = false;
-      } else if (this.sgo == false) {
-        this.sgo = true;
-      }
       this.$store.commit("changeP", this.sgo);
-
       this.initList();
       this.currentPath = this.$store.state.realPath;
       this.hs = [
@@ -322,44 +343,59 @@ export default {
     initList() {
       getFileList(this.$store.state.realPath, null).then((res) => {
         this.contents = res.data;
+        this.isRoot = true;
       });
     },
 
+    handleScroll(vertical, horizontal, nativeEvent) {
+      // console.log(vertical.scrollTop)
+      // 滚动超过400 就出现backtop图标
+      if (vertical.scrollTop >= 400) {
+        this.backTopVisible = true;
+      } else {
+        this.backTopVisible = false;
+      }
+    },
 
-     handleScroll(vertical, horizontal, nativeEvent) {
-                // console.log(vertical.scrollTop)
-        // 滚动超过400 就出现backtop图标
-          if(vertical.scrollTop>=400){
-            this.backTopVisible = true;
-          }else{
-            this.backTopVisible = false;
-          }
-     },
-
-     backToTop(){
-        this.$refs["vs"].scrollIntoView(".main_scroll_content", 100);
-     },
+    backToTop() {
+      this.$refs["vs"].scrollIntoView(".main_scroll_content", 100);
+    },
 
     /**
      *  使url path的滚动条到最后
      */
-     scrollLast(){
-        this.$refs["pathVs"].scrollTo(
+    scrollLast() {
+      this.$refs["pathVs"].scrollTo(
         {
-       x: "100%"
-       },
-       0,
-       "easeInQuad"
-          );
-     },
+          x: "100%",
+        },
+        0,
+        "easeInQuad"
+      );
+    },
 
-      /**
-       * url path的内容发生变化后 滚动条滚到最后
-       */
-      handleResize() {
-                // console.log('content has resized!')
-                this.scrollLast();
-            }
+    /**
+     * url path的内容发生变化后 滚动条滚到最后
+     */
+    handleResize() {
+      // console.log('content has resized!')
+      this.scrollLast();
+    },
+
+   /**
+    * 返回上一级
+    */
+   backToPrevious(){
+      if(this.currentPath==""){
+        this.$message("(˃ ⌑ ˂ഃ )客官,返回不了啦");
+        return;
+      }
+      // 当前返回上一级后的菜单index -1
+      let currentIndex = this.hs.length-1-1;
+      let currentContent = this.hs[currentIndex];
+       //跳到上一层位置
+      this.gopage(currentContent, currentIndex);
+   },
 
   },
 };
@@ -374,6 +410,7 @@ export default {
 }
 
 .prename {
+  text-align: center;
   height: 30px;
   line-height: 30px;
   margin-top: 5px;
@@ -414,8 +451,8 @@ export default {
   color: #42859396;
   line-height: 30px;
   display: flex;
-  word-break:keep-all;/* 内容/字不换行 */
-  white-space:nowrap;/* 不换行 */
+  word-break: keep-all; /* 内容/字不换行 */
+  white-space: nowrap; /* 不换行 */
 }
 
 .url-path div {
@@ -425,7 +462,7 @@ export default {
 }
 
 .url-path div:after {
- content: " /";
+  content: " /";
 }
 
 .keyword-select {
@@ -446,7 +483,7 @@ export default {
   flex-shrink: 0;
 }
 
-.show-box button {
+ button {
   cursor: pointer;
   border: 0; /* 清除默认边框 */
   outline: none;
@@ -460,12 +497,13 @@ export default {
 }
 
 .scroll_content {
-  height: 700px;
+  height: calc(100% - 100px);
   border: #ead9d9 solid 1px;
+  border-bottom:none;
 }
 
 .loading-icon {
-    background: #000;
+  background: #000;
 }
 
 ul {
@@ -477,7 +515,7 @@ ul {
 }
 
 .main_scroll_content li {
-  height: 120px;
+  height: 100%;
 }
 
 ul > i {
@@ -491,10 +529,13 @@ ul > i {
 
 .file-li-item {
   width: 80%;
-  margin-left: auto;
+  margin: auto;
 }
 
 .file-svg-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
   margin-top: 5px;
 }
 
@@ -505,6 +546,15 @@ ul > i {
 
 .empty-msg-box {
   margin-top: 150px;
+}
+
+.util-col {
+  display: flex;
+  flex-direction: row-reverse;
+  height: 40px;
+  background-color: #fff;
+  border: #ead9d9 solid 1px;
+  border-top:none;
 }
 
 /* list style */
@@ -530,6 +580,8 @@ ul > i {
 
 .list-file-ul .file-svg-icon {
   margin-top: 0;
+  margin-left: 0%;
+   margin-right: 0%;
 }
 
 .list-file-ul li:hover .prename {
