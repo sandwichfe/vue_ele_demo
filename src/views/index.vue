@@ -387,7 +387,12 @@ export default {
     */
    backToPrevious(){
       if(this.currentPath==""){
-        this.$message("(˃ ⌑ ˂ഃ )客官,返回不了啦");
+        this.$message( {
+          message: '(˃ ⌑ ˂ഃ )客官,返回不了啦',
+          duration:1000,
+          showClose:false,
+          iconClass:null,
+        });
         return;
       }
       // 当前返回上一级后的菜单index -1
