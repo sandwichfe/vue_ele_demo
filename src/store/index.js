@@ -6,8 +6,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
         realPath: "root",
-
-        goP:"http://192.168.31.215:6688/"
+        goP:"http://192.168.8.68:6694/"
     },
     mutations: {
         changeP(state, p) {

@@ -52,6 +52,9 @@
               :key="index"
               @click="go(c)"
               class="line"
+              @touchstart="gtouchstart(c,$event)"
+              @touchmove="gtouchmove()"
+              @touchend="showDeleteButton(c)"
             >
               <div class="file-li-item">
                 <div class="file-svg-icon">
@@ -126,6 +129,7 @@ import { love } from "@/utils/love";
 export default {
   name: "index",
   components: { BackTop },
+  
   data() {
     return {
       listType: true,
@@ -197,6 +201,7 @@ export default {
         },
       },
       serachValue: "",
+      timeOutEvent: 0,             //长按操作相关
     };
   },
     computed: {
@@ -226,9 +231,13 @@ export default {
     this.initList();
   },
   mounted() {
-    love();
+    // love();
   },
   methods: {
+
+    /**
+     * 进入下一级目录或文件夹
+     */
     go(content) {
       var type = content.type;
       var path = content.path;
@@ -255,28 +264,27 @@ export default {
           this.serachValue = "";
         });
       } else if (type === "file") {
-        //正斜杠替换反斜杠
+        debugger
+        //路径 正斜杠替换反斜杠
         var z = path.replace(/\\/g, "/");
-        //前缀路径替换
-        var zreg = new RegExp("this.$store.state.realPath" + "/", "g"); //g代表全部
-        var aba = z.replace(zreg, "");
-        var gohref = this.$store.state.goP + aba;
-
-        //正斜杠替换反斜杠
-        var z22 = gohref.replace(/D:/g, "");
+        // url前缀路径+文件路径
+        var gohref = this.$store.state.goP + z;
+        //盘符路径   替换掉盘符路径 直接就是nginx可以代理的路径
+        var nginxPath = gohref.replace(/C:/g, "");
 
         if (gohref.indexOf("E:") !== -1) {
-          z22 = z22.replace(/E:/g, "");
-          z22 = z22.replace(/6688/g, "6695");
+          // 端口转换 6688转到6695
+          nginxPath = nginxPath.replace(/6688/g, "6695");
         }
-
-        //前缀路径替换
-        var zreg22 = new RegExp("this.$store.state.realPath" + "/", "g"); //g代表全部
-        var aba22 = z22.replace(zreg22, "");
-        window.open(aba22, "_blank");
+        //打开
+        window.open(nginxPath, "_blank");
       }
+
     },
 
+    /**
+     * 跳到某一个路径
+     */
     gopage(content, index) {
       //跳到点击位置的索引   index 后面的内容直接干掉
       var fds = this.hs.slice(0, index + 1);
@@ -335,6 +343,9 @@ export default {
       }
     },
 
+    /**
+     * 切换为表格/列表样式
+     */
     switchList() {
       this.listType = !this.listType;
       this.$refs["vs"].scrollIntoView(".main_scroll_content", 0);
@@ -401,6 +412,38 @@ export default {
        //跳到上一层位置
       this.gopage(currentContent, currentIndex);
    },
+
+    //长按事件（起始）
+    gtouchstart(item,ev) {
+      var self = this;
+      this.timeOutEvent = setTimeout(function () {
+        self.longPress(item,ev);
+      }, 500); //这里设置定时器，定义长按500毫秒触发长按事件
+      return false;
+    },
+    //手释放，如果在500毫秒内就释放，则取消长按事件，此时可以执行onclick应该执行的事件
+    showDeleteButton(item) {
+      clearTimeout(this.timeOutEvent); //清除定时器
+      if (this.timeOutEvent != 0) {
+        //这里写要执行的内容（如onclick事件）
+        console.log("点击但未长按");
+      }
+      return false;
+    },
+    //如果手指有移动，则取消所有事件，此时说明用户只是要移动而不是长按
+    gtouchmove() {
+      clearTimeout(this.timeOutEvent); //清除定时器
+      this.timeOutEvent = 0;
+    },
+    //真正长按后应该执行的内容
+    longPress(val,ev) {
+      this.timeOutEvent = 0;
+      //执行长按要执行的内容，如弹出菜单
+
+      console.log("长按");
+    },
+
+      
 
   },
 };

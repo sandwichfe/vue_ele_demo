@@ -1,3 +1,11 @@
+<!--
+ * @Author: sandwichfe 1344382941@qq.com
+ * @Date: 2022-08-10 10:06:38
+ * @LastEditors: sandwichfe 1344382941@qq.com
+ * @LastEditTime: 2022-08-29 13:27:21
+ * @FilePath: \vue_ele_demo\src\App.vue
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 <template>
     <div id="app">
         <router-view/>
@@ -8,6 +16,9 @@
     * {
         margin: 0;
         padding: 0;
+        /** 取消移动端默认的长按选中文字 */
+        -webkit-touch-callout: none !important;
+        -webkit-user-select: none;
     }
 
     #app {
