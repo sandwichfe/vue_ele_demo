@@ -24,16 +24,13 @@
       <!-- 样式切换 -->
       <div class="back-box" @click="backToPrevious">
         <button>
-          <svg-icon
-            iconClass="back_3"
-            className="list-btn-switch"
-          ></svg-icon>
+          <svg-icon iconClass="back_3" className="list-btn-switch"></svg-icon>
         </button>
       </div>
     </div>
 
     <div
-      :style="{height: scrollerHeight}"
+      :style="{ height: scrollerHeight }"
       class="scroll_content"
       v-loading="loading"
       element-loading-text="o(*≧▽≦)ツ加载中~"
@@ -52,7 +49,7 @@
               :key="index"
               @click="go(c)"
               class="line"
-              @touchstart="gtouchstart(c,$event)"
+              @touchstart="gtouchstart(c)"
               @touchmove="gtouchmove()"
               @touchend="showDeleteButton(c)"
             >
@@ -111,6 +108,46 @@
         </button>
       </div>
     </div>
+
+      <!-- 长按菜单 -->
+    <div class="long-menu-box">
+      <el-dialog 
+      :title="this.currentLongChecked.type+'-'+this.currentLongChecked.preName"
+      :visible.sync="outerVisible" 
+      width="80%"
+      :show-close = false>
+
+          <ul class="operate-menu">
+            <li v-show="this.currentLongChecked.type=='folder'" @click="innerVisible=true">上传文件</li>
+            <li v-show="this.currentLongChecked.type=='file' ">下载此文件</li>
+            <li>删除此{{this.currentLongChecked.type=='file'? '文件' : '文件夹'}}</li>
+          </ul>
+
+
+        <div class="upload-file-box">
+         <el-dialog
+          width="60%"
+          title="上传"
+          :visible.sync="innerVisible"
+          append-to-body
+        >
+             <el-upload
+                class="upload-demo"
+                ref="upload"
+                action="https://jsonplaceholder.typicode.com/posts/"
+                :on-preview="handlePreview"
+                :on-remove="handleRemove"
+                :file-list="fileList"
+                :auto-upload="false">
+                <el-button slot="trigger" style="margin-left:-20px" >选取文件</el-button>
+                <el-button  @click="submitUpload">上传</el-button>
+              </el-upload>
+        </el-dialog>
+          </div>   
+
+
+      </el-dialog>
+    </div>
   </div>
 </template>
 
@@ -129,15 +166,17 @@ import { love } from "@/utils/love";
 export default {
   name: "index",
   components: { BackTop },
-  
+
   data() {
     return {
       listType: true,
       contents: [1, 2, 3],
       loading: false,
       backTopVisible: false,
-      currentPath: '', 
-      hs: [{ type: "folder", path: this.$store.state.realPath, preName: "首页" }],
+      currentPath: "",
+      hs: [
+        { type: "folder", path: this.$store.state.realPath, preName: "首页" },
+      ],
       ops: {
         vuescroll: {
           mode: "native", //模式:pc natice 移动端是slice
@@ -201,15 +240,21 @@ export default {
         },
       },
       serachValue: "",
-      timeOutEvent: 0,             //长按操作相关
+      timeOutEvent: 0, //长按操作相关
+      outerVisible: false, //长按菜单
+      innerVisible: false,
+      currentLongChecked:{
+        preName:""
+      },   //当前被长按选择的文件/文件夹
+      fileList: [{name: 'food.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}, {name: 'food2.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}]
     };
   },
-    computed: {
-      // 滚动区高度 
-      scrollerHeight: function() {
-      return (document.documentElement.clientHeight - 30-40-41-5) + 'px'; //自定义高度需求  不知道这多的5px哪来的..
-       }
-     },
+  computed: {
+    // 滚动区高度
+    scrollerHeight: function () {
+      return document.documentElement.clientHeight - 30 - 40 - 41 - 5 + "px"; //自定义高度需求  不知道这多的5px哪来的..
+    },
+  },
   watch: {
     //watch serachValue change
     serachValue() {
@@ -231,10 +276,9 @@ export default {
     this.initList();
   },
   mounted() {
-    // love();
+    love();
   },
   methods: {
-
     /**
      * 进入下一级目录或文件夹
      */
@@ -245,7 +289,7 @@ export default {
 
       var newGo = this.currentPath + "\\" + preName;
       // 此时是root路径不用加斜杠
-      if(this.currentPath==""){
+      if (this.currentPath == "") {
         newGo = preName;
       }
       if (type === "folder") {
@@ -264,7 +308,7 @@ export default {
           this.serachValue = "";
         });
       } else if (type === "file") {
-        debugger
+        debugger;
         //路径 正斜杠替换反斜杠
         var z = path.replace(/\\/g, "/");
         // url前缀路径+文件路径
@@ -279,7 +323,6 @@ export default {
         //打开
         window.open(nginxPath, "_blank");
       }
-
     },
 
     /**
@@ -305,10 +348,9 @@ export default {
       });
 
       // 回到了root 路径
-      if(content.path=="root"){
-         this.currentPath = "";
+      if (content.path == "root") {
+        this.currentPath = "";
       }
-
     },
 
     /**
@@ -393,31 +435,31 @@ export default {
       this.scrollLast();
     },
 
-   /**
-    * 返回上一级
-    */
-   backToPrevious(){
-      if(this.currentPath==""){
-        this.$message( {
-          message: '(˃ ⌑ ˂ഃ )客官,返回不了啦',
-          duration:1000,
-          showClose:false,
-          iconClass:null,
+    /**
+     * 返回上一级
+     */
+    backToPrevious() {
+      if (this.currentPath == "") {
+        this.$message({
+          message: "(˃ ⌑ ˂ഃ )客官,返回不了啦",
+          duration: 1000,
+          showClose: false,
+          iconClass: null,
         });
         return;
       }
       // 当前返回上一级后的菜单index -1
-      let currentIndex = this.hs.length-1-1;
+      let currentIndex = this.hs.length - 1 - 1;
       let currentContent = this.hs[currentIndex];
-       //跳到上一层位置
+      //跳到上一层位置
       this.gopage(currentContent, currentIndex);
-   },
+    },
 
     //长按事件（起始）
-    gtouchstart(item,ev) {
+    gtouchstart(item) {
       var self = this;
       this.timeOutEvent = setTimeout(function () {
-        self.longPress(item,ev);
+        self.longPress(item);
       }, 500); //这里设置定时器，定义长按500毫秒触发长按事件
       return false;
     },
@@ -436,16 +478,32 @@ export default {
       this.timeOutEvent = 0;
     },
     //真正长按后应该执行的内容
-    longPress(val,ev) {
+    longPress(val) {
       this.timeOutEvent = 0;
       //执行长按要执行的内容，如弹出菜单
 
       console.log("长按");
+      this.outerVisible = true;
+
+      this.currentLongChecked = val;
+      // end
     },
 
-      
+
+     submitUpload() {
+        this.$refs.upload.submit();
+      },
+      handleRemove(file, fileList) {
+        console.log(file, fileList);
+      },
+      handlePreview(file) {
+        console.log(file);
+      }
+
 
   },
+
+  
 };
 </script>
 
@@ -531,7 +589,7 @@ export default {
   flex-shrink: 0;
 }
 
- button {
+button {
   cursor: pointer;
   border: 0; /* 清除默认边框 */
   outline: none;
@@ -547,7 +605,7 @@ export default {
 .scroll_content {
   height: calc(100% - 100px);
   border: #ead9d9 solid 1px;
-  border-bottom:none;
+  border-bottom: none;
 }
 
 .loading-icon {
@@ -602,8 +660,35 @@ ul > i {
   height: 40px;
   background-color: #fff;
   border: #ead9d9 solid 1px;
-  border-top:none;
+  border-top: none;
 }
+
+/** element ui 样式穿透 保证不会影响到其他位置的样式 */
+.long-menu-box >>> .el-dialog__header {
+  background-color: #edeeee;
+}
+
+* >>> .el-dialog__body
+{
+      padding: 10px 0px 10px 20px
+}
+
+.upload-file-box >>> .el-dialog__header{
+    margin: 0;
+    padding: 0;
+}
+
+.operate-menu {
+  display: flex;
+}
+
+.operate-menu li {
+  width: 100%;
+  line-height: 40px;
+  margin-bottom: 5px;
+  color:#000
+}
+
 
 /* list style */
 .list-file-ul {
@@ -629,7 +714,7 @@ ul > i {
 .list-file-ul .file-svg-icon {
   margin-top: 0;
   margin-left: 0%;
-   margin-right: 0%;
+  margin-right: 0%;
 }
 
 .list-file-ul li:hover .prename {
