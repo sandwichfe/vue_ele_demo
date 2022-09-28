@@ -112,7 +112,7 @@
       <!-- 长按菜单 -->
     <div class="long-menu-box">
       <el-dialog 
-      :title="this.currentLongChecked.type+'-'+this.currentLongChecked.preName"
+      :title="this.currentLongChecked.type+'  '+this.currentLongChecked.preName"
       :visible.sync="outerVisible" 
       width="80%"
       :show-close = false>
@@ -120,9 +120,24 @@
           <ul class="operate-menu">
             <li v-show="this.currentLongChecked.type=='folder'" @click="innerVisible=true">上传文件</li>
             <li v-show="this.currentLongChecked.type=='file' ">下载此文件</li>
-            <li>删除此{{this.currentLongChecked.type=='file'? '文件' : '文件夹'}}</li>
+            <li @click="deleteFileButton()">删除此{{this.currentLongChecked.type=='file'? '文件' : '文件夹'}} </li>
           </ul>
 
+          <!-- 删除提示 -->
+          <div>
+              <el-dialog
+          title="删除"
+          :visible.sync="deleteConfirmdialogVisible"
+          append-to-body
+          width="40%"
+          :before-close="handleClose">
+          <span>这是一段信息</span>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="deleteConfirmdialogVisible = false">取 消</el-button>
+            <el-button @click="gotoDeleteFile()">确 定</el-button>
+          </span>
+            </el-dialog>
+          </div>
 
         <div class="upload-file-box">
          <el-dialog
@@ -146,6 +161,8 @@
           </div>   
 
 
+        
+
       </el-dialog>
     </div>
   </div>
@@ -160,7 +177,7 @@ const delay = (function () {
     timer = setTimeout(callback, ms);
   };
 })();
-import { getFileList } from "@/network/base"; //引入自己封装的axios请求函数
+import { getFileList,deleteFile } from "@/network/base"; //引入自己封装的axios请求函数
 import BackTop from "../components/backTop/BackTop.vue";
 import { love } from "@/utils/love";
 export default {
@@ -243,6 +260,7 @@ export default {
       timeOutEvent: 0, //长按操作相关
       outerVisible: false, //长按菜单
       innerVisible: false,
+      deleteConfirmdialogVisible:false,
       currentLongChecked:{
         preName:""
       },   //当前被长按选择的文件/文件夹
@@ -276,7 +294,7 @@ export default {
     this.initList();
   },
   mounted() {
-    love();
+    // love();
   },
   methods: {
     /**
@@ -498,6 +516,39 @@ export default {
       },
       handlePreview(file) {
         console.log(file);
+      },
+
+      handleClose(){},
+
+      /**
+       *  删除此路径文件或文件夹
+       */
+      deleteFileButton(){
+        let currentFile = this.currentLongChecked;
+        this.deleteConfirmdialogVisible = true;
+      },
+
+      gotoDeleteFile(){
+          deleteFile(this.currentLongChecked.path).then(res=>{
+           this.$message({
+          message: res.msg,
+          duration: 1000,
+          showClose: false,
+          iconClass: null,
+        });
+      if(res.code==200){
+        this.deleteConfirmdialogVisible = false;
+        this.outerVisible = false;
+        this.flushCurrentPath();
+      } 
+          });
+      
+      },
+
+      flushCurrentPath(){
+          getFileList(this.currentPath, null).then((res) => {
+          this.contents = res.data;
+      });
       }
 
 

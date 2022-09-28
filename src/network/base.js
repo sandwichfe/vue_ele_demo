@@ -9,3 +9,12 @@ export function getFileList(filePath, queryWord) {
         keyword:queryWord,
       }
     })}
+
+    export function deleteFile(filePath) {
+      return request({
+          method: "delete",
+          url: "/file/deleteFile",
+        params: {         
+          path:filePath
+        }
+      })}
