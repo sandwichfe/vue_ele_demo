@@ -109,60 +109,79 @@
       </div>
     </div>
 
-      <!-- 长按菜单 -->
+    <!-- 长按菜单 -->
     <div class="long-menu-box">
-      <el-dialog 
-      :title="this.currentLongChecked.type+'  '+this.currentLongChecked.preName"
-      :visible.sync="outerVisible" 
-      width="80%"
-      :show-close = false>
+      <el-dialog
+        :title="
+          this.currentLongChecked.type + '  ' + this.currentLongChecked.preName
+        "
+        :visible.sync="outerVisible"
+        width="80%"
+        :show-close="false"
+      >
+        <ul class="operate-menu">
+          <li
+            v-show="this.currentLongChecked.type == 'folder'"
+            @click="innerVisible = true"
+          >
+            上传文件
+          </li>
+          <li
+            v-show="this.currentLongChecked.type == 'file'"
+            @click="copyDownloadUrl()"
+          >
+            下载此文件
+          </li>
+          <li @click="deleteFileButton()">
+            删除此{{
+              this.currentLongChecked.type == "file" ? "文件" : "文件夹"
+            }}
+          </li>
+        </ul>
 
-          <ul class="operate-menu">
-            <li v-show="this.currentLongChecked.type=='folder'" @click="innerVisible=true">上传文件</li>
-            <li v-show="this.currentLongChecked.type=='file' ">下载此文件</li>
-            <li @click="deleteFileButton()">删除此{{this.currentLongChecked.type=='file'? '文件' : '文件夹'}} </li>
-          </ul>
-
-          <!-- 删除提示 -->
-          <div>
-              <el-dialog
-          title="删除"
-          :visible.sync="deleteConfirmdialogVisible"
-          append-to-body
-          width="40%"
-          :before-close="handleClose">
-          <span>这是一段信息</span>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="deleteConfirmdialogVisible = false">取 消</el-button>
-            <el-button @click="gotoDeleteFile()">确 定</el-button>
-          </span>
-            </el-dialog>
-          </div>
+        <!-- 删除提示 -->
+        <div>
+          <el-dialog
+            title="删除"
+            :visible.sync="deleteConfirmdialogVisible"
+            append-to-body
+            width="40%"
+            :before-close="handleClose"
+          >
+            <span>这是一段信息</span>
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="deleteConfirmdialogVisible = false"
+                >取 消</el-button
+              >
+              <el-button @click="gotoDeleteFile()">确 定</el-button>
+            </span>
+          </el-dialog>
+        </div>
 
         <div class="upload-file-box">
-         <el-dialog
-          width="60%"
-          title="上传"
-          :visible.sync="innerVisible"
-          append-to-body
-        >
-             <el-upload
-                class="upload-demo"
-                ref="upload"
-                action="https://jsonplaceholder.typicode.com/posts/"
-                :on-preview="handlePreview"
-                :on-remove="handleRemove"
-                :file-list="fileList"
-                :auto-upload="false">
-                <el-button slot="trigger" style="margin-left:-20px" >选取文件</el-button>
-                <el-button  @click="submitUpload">上传</el-button>
-              </el-upload>
-        </el-dialog>
-          </div>   
-
-
-        
-
+          <el-dialog
+            width="60%"
+            title="上传"
+            :visible.sync="innerVisible"
+            append-to-body
+          >
+            <el-upload
+              class="upload-demo"
+              ref="upload"
+              action=""
+              :http-request="uploadImage"
+              :on-preview="handlePreview"
+              :on-remove="handleRemove"
+              :file-list="fileList"
+              :auto-upload="false"
+            >
+              <el-button slot="trigger" style="margin-left: -20px"
+                >选取文件</el-button
+              >
+              <el-button @click="submitUpload">上传</el-button>
+            </el-upload>
+          </el-dialog>
+        </div>
       </el-dialog>
     </div>
   </div>
@@ -177,7 +196,7 @@ const delay = (function () {
     timer = setTimeout(callback, ms);
   };
 })();
-import { getFileList,deleteFile } from "@/network/base"; //引入自己封装的axios请求函数
+import { getFileList, deleteFile } from "@/network/base"; //引入自己封装的axios请求函数
 import BackTop from "../components/backTop/BackTop.vue";
 import { love } from "@/utils/love";
 export default {
@@ -260,11 +279,16 @@ export default {
       timeOutEvent: 0, //长按操作相关
       outerVisible: false, //长按菜单
       innerVisible: false,
-      deleteConfirmdialogVisible:false,
-      currentLongChecked:{
-        preName:""
-      },   //当前被长按选择的文件/文件夹
-      fileList: [{name: 'food.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}, {name: 'food2.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}]
+      deleteConfirmdialogVisible: false,
+      currentLongChecked: {
+        preName: "",
+      }, //当前被长按选择的文件/文件夹
+      fileList: [
+        {
+          name: "food2.jpeg",
+          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
+        },
+      ],
     };
   },
   computed: {
@@ -507,54 +531,83 @@ export default {
       // end
     },
 
+    submitUpload() {
+      this.$refs.upload.submit();
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePreview(file) {
+      console.log(file);
+    },
 
-     submitUpload() {
-        this.$refs.upload.submit();
-      },
-      handleRemove(file, fileList) {
-        console.log(file, fileList);
-      },
-      handlePreview(file) {
-        console.log(file);
-      },
+    handleClose() {},
 
-      handleClose(){},
+    /**
+     *  删除此路径文件或文件夹
+     */
+    deleteFileButton() {
+      let currentFile = this.currentLongChecked;
+      this.deleteConfirmdialogVisible = true;
+    },
 
-      /**
-       *  删除此路径文件或文件夹
-       */
-      deleteFileButton(){
-        let currentFile = this.currentLongChecked;
-        this.deleteConfirmdialogVisible = true;
-      },
-
-      gotoDeleteFile(){
-          deleteFile(this.currentLongChecked.path).then(res=>{
-           this.$message({
+    gotoDeleteFile() {
+      deleteFile(this.currentLongChecked.path).then((res) => {
+        this.$message({
           message: res.msg,
           duration: 1000,
           showClose: false,
           iconClass: null,
         });
-      if(res.code==200){
-        this.deleteConfirmdialogVisible = false;
-        this.outerVisible = false;
-        this.flushCurrentPath();
-      } 
-          });
-      
-      },
-
-      flushCurrentPath(){
-          getFileList(this.currentPath, null).then((res) => {
-          this.contents = res.data;
+        if (res.code == 200) {
+          this.deleteConfirmdialogVisible = false;
+          this.outerVisible = false;
+          this.flushCurrentPath();
+        }
       });
+    },
+
+    flushCurrentPath() {
+      getFileList(this.currentPath, null).then((res) => {
+        this.contents = res.data;
+      });
+    },
+
+    uploadImage() {
+      // 创建文件流
+      const formData = new FormData();
+      // formData.append('file[0]', this.fileObj.raw)
+    },
+
+    copyDownloadUrl() {
+      let currentFile = this.currentLongChecked;
+      let path = currentFile.path;
+
+      var z = path.replace(/\\/g, "/");
+      var gohref = this.$store.state.goP + z;
+      var nginxPath = gohref.replace(/C:/g, "");
+      if (gohref.indexOf("E:") !== -1) {
+        // 端口转换 6688转到6695
+        nginxPath = nginxPath.replace(/6688/g, "6695");
       }
+      console.log(nginxPath);
+      this.copy(nginxPath);
+    },
 
-
+    // 复制功能
+    copy(val) {
+      console.log(val, "复制链接");
+      let url = val; // 后台接口返回的链接地址
+      let inputNode = document.createElement("input"); // 创建input
+      inputNode.value = url; // 赋值给 input 值
+      document.body.appendChild(inputNode); // 插入进去
+      inputNode.select(); // 选择对象
+      document.execCommand("Copy"); // 原生调用执行浏览器复制命令
+      inputNode.className = "oInput";
+      inputNode.style.display = "none"; // 隐藏
+      this.$message.success("复制成功");
+    },
   },
-
-  
 };
 </script>
 
@@ -719,14 +772,13 @@ ul > i {
   background-color: #edeeee;
 }
 
-* >>> .el-dialog__body
-{
-      padding: 10px 0px 10px 20px
+* >>> .el-dialog__body {
+  padding: 10px 0px 10px 20px;
 }
 
-.upload-file-box >>> .el-dialog__header{
-    margin: 0;
-    padding: 0;
+.upload-file-box >>> .el-dialog__header {
+  margin: 0;
+  padding: 0;
 }
 
 .operate-menu {
@@ -737,9 +789,8 @@ ul > i {
   width: 100%;
   line-height: 40px;
   margin-bottom: 5px;
-  color:#000
+  color: #000;
 }
-
 
 /* list style */
 .list-file-ul {

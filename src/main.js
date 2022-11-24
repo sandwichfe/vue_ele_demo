@@ -15,6 +15,12 @@ import('@/icons')
 import ViewUI from 'view-design';
 import 'view-design/dist/styles/iview.css';*/
 
+
+// clipboard
+import clipboard from 'clipboard'
+Vue.prototype.clipboard = clipboard
+
+
 import vuescroll from "vuescroll";//引入vuescroll
 import "vuescroll/dist/vuescroll.css";//引入vuescroll样式
 

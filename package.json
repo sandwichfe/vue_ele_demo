@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "clipboard": "^2.0.11",
     "core-js": "^3.6.4",
     "element-ui": "^2.15.3",
     "svg-sprite-loader": "^6.0.11",
