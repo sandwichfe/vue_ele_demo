@@ -1,6 +1,6 @@
 <<<<<<< HEAD
 # vue_ele_demo
-this a vue demo project
+文件浏览器
 =======
 # vue_element-ui_demo
 
